@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;	
@@ -12,6 +13,7 @@ namespace ConsoleApplication
         public static void Main(string[] args)
         {
 		var host = new WebHostBuilder()
+			.UseContentRoot(Directory.GetCurrentDirectory()) //ref: so this works: return View("~/helloworld.cshtml"); explicit filename
 			.UseKestrel()
 			.UseStartup<Startup>()
 			.Build();
@@ -20,6 +22,7 @@ namespace ConsoleApplication
         }
     }
 
+	//configure runs first, then configureServices
 	public class Startup
 	{
 
@@ -28,8 +31,10 @@ namespace ConsoleApplication
 			services.AddMvc();
 		}
 
+		
 		public void Configure(IApplicationBuilder app)
 		{
+			//app.UseDeveloperExceptionPage();
 			app.UseMvc();
 		}
 
@@ -56,7 +61,7 @@ namespace ConsoleApplication
 */
 	}
 
-	public class HelloWorldController 
+	public class HelloWorldController: Controller
 	{
 		[HttpGet("api/helloworld")]
 		public object HelloWorld()
@@ -66,6 +71,16 @@ namespace ConsoleApplication
 				message = "Hello World",
 				time = DateTime.Now
 			};
+		}
+
+		[HttpGet("helloworld")]
+		public ActionResult HelloWorldMvc()
+		{
+			ViewBag.Message = "Hello World";
+			ViewBag.Time = DateTime.Now;
+
+			return View("~/helloworld.cshtml");
+			
 		}
 	}
 }
